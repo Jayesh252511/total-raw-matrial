@@ -31,14 +31,14 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
   // For sells: display total = (rate + gadi_bhada) * qty * 1.05  (5% GST baked in)
   // For purchase: display total = total_amount (rate*qty)
   const displayTotal = (r: Row) => {
-    const base = isSell
-      ? (Number(r.rate) || 0) * (Number(r.quantity) || 0) + (Number(r.gadi_bhada) || 0) * (Number(r.quantity) || 0)
-      : Number(r.total_amount) || 0;
-    return isSell ? withGst(base) : base;
+    if (!isSell) return Number(r.total_amount) || 0;
+    const base = (Number(r.rate) || 0) * (Number(r.quantity) || 0);
+    return withGst(base);
   };
   const displayWithoutGB = (r: Row) => {
-    const base = (Number(r.rate) || 0) * (Number(r.quantity) || 0);
-    return isSell ? withGst(base) : base;
+    const total = displayTotal(r);
+    if (!isSell) return total;
+    return total - (Number(r.gadi_bhada) || 0) * (Number(r.quantity) || 0);
   };
 
   // filtered
@@ -221,9 +221,9 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
                   <div className="rounded-md bg-muted/40 px-3 py-2 space-y-1 text-sm">
                     {isSell ? (
                       <>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Amount w/o Gadi Bhada</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)))}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Total Amount</span><span className="font-semibold tabular-nums">{fmtINR(withGst(((Number(form.rate) || 0) + (Number(form.gadi_bhada) || 0)) * (Number(form.quantity) || 0)))}</span></div>
-                        <p className="text-[10px] text-muted-foreground">Includes 5% GST</p>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Total Amount</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)))}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Amount w/o Gadi Bhada</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)) - (Number(form.gadi_bhada) || 0) * (Number(form.quantity) || 0))}</span></div>
+                        <p className="text-[10px] text-muted-foreground">Includes 5% GST on Total Amount</p>
                       </>
                     ) : (
                       <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold tabular-nums">{fmtINR((Number(form.rate) || 0) * (Number(form.quantity) || 0))}</span></div>
@@ -351,7 +351,7 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
             })}
           </tbody>
         </table>
-        {isSell && <p className="px-3 py-2 text-[11px] text-muted-foreground border-t">All sell totals include {SELL_GST_RATE * 100}% GST. Total Amount = (Rate + Gadi Bhada) × Qty × 1.05.</p>}
+        {isSell && <p className="px-3 py-2 text-[11px] text-muted-foreground border-t">All sell totals include {SELL_GST_RATE * 100}% GST. Total Amount = Rate × Qty × 1.05. Amount w/o Gadi Bhada = Total Amount - (Gadi Bhada × Qty).</p>}
       </div>
     </div>
   );
