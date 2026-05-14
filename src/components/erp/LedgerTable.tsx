@@ -279,8 +279,12 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
                 )}
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div className="rounded bg-muted/30 px-2 py-1.5"><span className="block text-[10px] uppercase text-muted-foreground">Qty</span><span className="tabular-nums">{fmtNum(Number(r.quantity), 3)} t</span></div>
-                <div className="rounded bg-muted/30 px-2 py-1.5"><span className="block text-[10px] uppercase text-muted-foreground">Rate</span><span className="tabular-nums">{fmtINR(Number(r.rate))}</span></div>
+                <div className="rounded bg-muted/30 px-2 py-1.5"><span className="block text-[10px] uppercase text-muted-foreground">Qty</span>
+                  <input disabled={readOnly} type="number" step="0.001" defaultValue={r.quantity} onBlur={(e) => Number(e.target.value) !== Number(r.quantity) && updateField(r, "quantity", e.target.value)} className="cell-input text-right tabular-nums !h-8" />
+                </div>
+                <div className="rounded bg-muted/30 px-2 py-1.5"><span className="block text-[10px] uppercase text-muted-foreground">Rate</span>
+                  <input disabled={readOnly} type="number" step="0.01" defaultValue={r.rate} onBlur={(e) => Number(e.target.value) !== Number(r.rate) && updateField(r, "rate", e.target.value)} className="cell-input text-right tabular-nums !h-8" />
+                </div>
                 {isSell && (
                   <div className="rounded bg-muted/30 px-2 py-1.5"><span className="block text-[10px] uppercase text-muted-foreground">Gadi Bhada</span>
                     <input disabled={readOnly} type="number" step="0.01" defaultValue={r.gadi_bhada || 0} onBlur={(e) => Number(e.target.value) !== Number(r.gadi_bhada || 0) && updateField(r, "gadi_bhada", e.target.value)} className="cell-input text-right tabular-nums !h-8" />
