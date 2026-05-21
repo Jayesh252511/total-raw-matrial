@@ -28,17 +28,19 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
-  // For sells: display total = (rate + gadi_bhada) * qty * 1.05  (5% GST baked in)
+  // For sells:
+  // Amt w/o Gadi Bhada (GST) = Rate * Qty * 1.05
+  // Total Amount (GST) = (Rate * Qty * 1.05) - Gadi Bhada (flat deduction)
   // For purchase: display total = total_amount (rate*qty)
   const displayTotal = (r: Row) => {
     if (!isSell) return Number(r.total_amount) || 0;
     const base = (Number(r.rate) || 0) * (Number(r.quantity) || 0);
-    return withGst(base);
+    return withGst(base) - (Number(r.gadi_bhada) || 0);
   };
   const displayWithoutGB = (r: Row) => {
-    const total = displayTotal(r);
-    if (!isSell) return total;
-    return total - (Number(r.gadi_bhada) || 0) * (Number(r.quantity) || 0);
+    if (!isSell) return Number(r.total_amount) || 0;
+    const base = (Number(r.rate) || 0) * (Number(r.quantity) || 0);
+    return withGst(base);
   };
 
   // filtered
@@ -216,13 +218,13 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
                     <label><span className="text-[11px] font-medium uppercase text-muted-foreground">Rate (₹/t)</span><Input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} /></label>
                   </div>
                   {isSell && (
-                    <label><span className="text-[11px] font-medium uppercase text-muted-foreground">Gadi Bhada (₹/t)</span><Input type="number" step="0.01" value={form.gadi_bhada} onChange={(e) => setForm({ ...form, gadi_bhada: e.target.value })} /></label>
+                    <label><span className="text-[11px] font-medium uppercase text-muted-foreground">Gadi Bhada (Flat Deduction)</span><Input type="number" step="0.01" value={form.gadi_bhada} onChange={(e) => setForm({ ...form, gadi_bhada: e.target.value })} /></label>
                   )}
                   <div className="rounded-md bg-muted/40 px-3 py-2 space-y-1 text-sm">
                     {isSell ? (
                       <>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Total Amount</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)))}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Amount w/o Gadi Bhada</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)) - (Number(form.gadi_bhada) || 0) * (Number(form.quantity) || 0))}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Total Amount (incl. GST)</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)) - (Number(form.gadi_bhada) || 0))}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Amount w/o Gadi Bhada</span><span className="font-semibold tabular-nums">{fmtINR(withGst((Number(form.rate) || 0) * (Number(form.quantity) || 0)))}</span></div>
                         <p className="text-[10px] text-muted-foreground">Includes 5% GST on Total Amount</p>
                       </>
                     ) : (
@@ -351,7 +353,7 @@ export function LedgerTable({ rows, readOnly, mode, onChanged }: Props) {
             })}
           </tbody>
         </table>
-        {isSell && <p className="px-3 py-2 text-[11px] text-muted-foreground border-t">All sell totals include {SELL_GST_RATE * 100}% GST. Total Amount = Rate × Qty × 1.05. Amount w/o Gadi Bhada = Total Amount - (Gadi Bhada × Qty).</p>}
+        {isSell && <p className="px-3 py-2 text-[11px] text-muted-foreground border-t">All sell totals include {SELL_GST_RATE * 100}% GST. Total Amount = (Rate × Qty × 1.05) - Gadi Bhada. Amount w/o Gadi Bhada = Rate × Qty × 1.05.</p>}
       </div>
     </div>
   );
