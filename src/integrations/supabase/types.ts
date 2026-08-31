@@ -85,6 +85,7 @@ export type Database = {
           created_at: string
           entry_date: string
           id: string
+          manual_amount: number
           name: string
           payment: number
           quantity: number
@@ -97,6 +98,7 @@ export type Database = {
           created_at?: string
           entry_date?: string
           id?: string
+          manual_amount?: number
           name?: string
           payment?: number
           quantity?: number
@@ -109,6 +111,7 @@ export type Database = {
           created_at?: string
           entry_date?: string
           id?: string
+          manual_amount?: number
           name?: string
           payment?: number
           quantity?: number
@@ -125,6 +128,7 @@ export type Database = {
           entry_date: string
           gadi_bhada: number
           id: string
+          manual_amount: number
           name: string
           payment: number
           quantity: number
@@ -139,6 +143,7 @@ export type Database = {
           entry_date?: string
           gadi_bhada?: number
           id?: string
+          manual_amount?: number
           name?: string
           payment?: number
           quantity?: number
@@ -153,6 +158,7 @@ export type Database = {
           entry_date?: string
           gadi_bhada?: number
           id?: string
+          manual_amount?: number
           name?: string
           payment?: number
           quantity?: number
