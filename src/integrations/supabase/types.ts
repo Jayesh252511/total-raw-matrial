@@ -47,6 +47,24 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_session: {
+        Row: {
+          data: Json
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          data: Json
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -55,6 +73,7 @@ export type Database = {
           entry_date: string
           id: string
           name: string
+          phonepay_txn_id: string | null
           serial_number: number
           updated_at: string
         }
@@ -65,6 +84,7 @@ export type Database = {
           entry_date?: string
           id?: string
           name?: string
+          phonepay_txn_id?: string | null
           serial_number?: number
           updated_at?: string
         }
@@ -75,6 +95,7 @@ export type Database = {
           entry_date?: string
           id?: string
           name?: string
+          phonepay_txn_id?: string | null
           serial_number?: number
           updated_at?: string
         }
